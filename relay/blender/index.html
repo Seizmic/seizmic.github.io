@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Relay: Blender to Unreal: user guide</title><link rel="icon" href="../../assets/mark.png"><style>
+:root { --bg:#11131a; --panel:#181b25; --line:#272c39; --text:#e9ebf1; --muted:#a0a6b4;
+        --accent:#ff8a5b; --accent2:#ffb347; color-scheme: dark; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--text); font:16px/1.65 "Segoe UI",system-ui,-apple-system,sans-serif; }
+a { color:var(--accent2); }
+header { border-bottom:1px solid var(--line); }
+header .in, main, footer .in { max-width:860px; margin:0 auto; padding:0 20px; }
+header .in { display:flex; align-items:center; gap:14px; height:68px; }
+header img { height:34px; }
+header a.home { color:var(--text); text-decoration:none; font-weight:700; letter-spacing:.12em; font-size:15px; }
+header nav { margin-left:auto; display:flex; gap:18px; font-size:14px; }
+header nav a { color:var(--muted); text-decoration:none; } header nav a:hover { color:var(--text); }
+main { padding:40px 20px 64px; }
+h1 { font-size:34px; line-height:1.2; margin:0 0 10px; }
+h1 + p { font-size:19px; color:var(--muted); margin-top:0; }
+h2 { font-size:23px; margin:44px 0 10px; padding-top:20px; border-top:1px solid var(--line); }
+h3 { font-size:18px; margin:28px 0 6px; }
+code { font:14px "Cascadia Code",Consolas,monospace; background:var(--panel); padding:1px 5px; border-radius:4px; }
+pre { background:#0b0d12; border:1px solid var(--line); border-radius:8px; padding:14px 16px; overflow-x:auto; }
+pre code { background:none; padding:0; }
+table { border-collapse:collapse; width:100%; margin:10px 0 18px; font-size:15px; display:block; overflow-x:auto; }
+th, td { text-align:left; vertical-align:top; padding:8px 10px; border-bottom:1px solid var(--line); }
+th { color:var(--muted); font-weight:600; }
+.pdf { display:inline-block; margin:6px 0 8px; padding:9px 16px; border-radius:8px; background:var(--accent);
+       color:#1a0f0a; font-weight:650; text-decoration:none; }
+.cards { display:grid; gap:16px; margin-top:28px; }
+.card { display:block; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:20px 22px;
+        color:var(--text); text-decoration:none; }
+.card:hover { border-color:var(--accent); }
+.card b { font-size:19px; } .card span { display:block; color:var(--muted); margin-top:4px; }
+footer { border-top:1px solid var(--line); color:var(--muted); font-size:14px; }
+footer .in { padding:22px 20px; }
+</style></head>
+<body><header><div class="in"><a href="../../"><img src="../../assets/mark.png" alt=""></a>
+<a class="home" href="../../">SEIZMIC</a><nav><a href="../../relay/unreal/">Relay for Unreal</a><a href="../../relay/blender/">Relay: Blender to Unreal</a></nav></div></header>
+<main><h1>Relay: Blender to Unreal user guide</h1>
+<p>Relay sends what you select in Blender straight into the Unreal project you have open. Static meshes, skeletal meshes, animations, materials, textures and cameras arrive with the right scale, pivots and names, and in the right place in your level. Sending again updates the same assets and actors instead of making copies.</p><p><a class="pdf" href="Relay-User-Guide.pdf">Download the guide (PDF)</a></p>
+<h2>Requirements</h2>
+<table>
+<thead>
+<tr>
+  <th></th>
+  <th>Tested</th>
+  <th>Designed for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Blender</td>
+  <td>4.2 LTS, 4.5 LTS, 5.2 LTS</td>
+  <td>4.2 LTS and newer</td>
+</tr>
+<tr>
+  <td>Unreal Engine</td>
+  <td>5.5 and 5.8 (Interchange and legacy FBX importers)</td>
+  <td>5.3 and newer</td>
+</tr>
+<tr>
+  <td>OS</td>
+  <td>Windows 11</td>
+  <td>Windows, macOS, Linux</td>
+</tr>
+</tbody>
+</table>
+<p>Blender and Unreal must run on the same computer. No Unreal plugin is needed; Relay uses the Python scripting that ships with Unreal.</p>
+<h2>Install</h2>
+<ol>
+<li>In Blender, open <strong>Edit &gt; Preferences &gt; Get Extensions</strong>, click the <strong>v</strong> menu at the top right, choose <strong>Install from Disk</strong> and pick <code>relay_unreal-1.1.0.zip</code>.</li>
+<li>Press <strong>N</strong> in the 3D viewport and open the <strong>Relay</strong> tab.</li>
+</ol>
+<h2>Set up Unreal (once per project)</h2>
+<ol>
+<li><strong>Edit &gt; Plugins</strong>: make sure <strong>Python Editor Script Plugin</strong> is enabled. Restart if Unreal asks.</li>
+<li><strong>Edit &gt; Project Settings &gt; Plugins &gt; Python</strong>: tick <strong>Enable Remote Execution</strong>.</li>
+</ol>
+<p>Or paste these lines into <code>&lt;YourProject&gt;/Config/DefaultEngine.ini</code> (the <strong>Copy Unreal Settings</strong> button in Relay's preferences copies them):</p>
+<pre><code class="language-ini">[/Script/PythonScriptPlugin.PythonScriptPluginSettings]
+bRemoteExecution=True
+</code></pre>
+<p>Back in Blender, click the refresh button next to the editor list. You should see <code>Connected: &lt;YourProject&gt; | UE 5.x</code>.</p>
+<h2>Sending</h2>
+<ul>
+<li><strong>Send Selected</strong> sends the selected objects.</li>
+<li><strong>Send Active Collection</strong> sends everything in the collection highlighted in the Outliner.</li>
+<li><strong>Object &gt; Send to Unreal</strong> does the same as Send Selected.</li>
+</ul>
+<p>Relay checks the selection first. Errors stop the send and show up under <strong>Check</strong>. Warnings are listed but don't block it. Blender stays usable while Unreal imports.</p>
+<p>Save your .blend before your first send. Relay remembers which actors in the level belong to which Blender objects by file name.</p>
+<h3>What gets sent</h3>
+<table>
+<thead>
+<tr>
+  <th>In Blender</th>
+  <th>In Unreal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Mesh, curve, text or surface object</td>
+  <td>Static mesh <code>SM_&lt;name&gt;</code>, pivot at the object origin</td>
+</tr>
+<tr>
+  <td>Linked duplicates (same mesh, same scale)</td>
+  <td>One static mesh, one actor per duplicate</td>
+</tr>
+<tr>
+  <td>Armature and the meshes it deforms</td>
+  <td>Skeletal mesh <code>SK_&lt;name&gt;</code> with skeleton and physics asset</td>
+</tr>
+<tr>
+  <td>Actions on that armature</td>
+  <td>Animation sequences <code>A_&lt;armature&gt;_&lt;action&gt;</code></td>
+</tr>
+<tr>
+  <td>Principled BSDF material</td>
+  <td>Material instance <code>MI_&lt;name&gt;</code></td>
+</tr>
+<tr>
+  <td>Image textures used by those materials</td>
+  <td>Textures <code>T_&lt;name&gt;</code> with the right color space and compression</td>
+</tr>
+<tr>
+  <td>Cameras</td>
+  <td>Cine Camera actors in a Level Sequence <code>LS_&lt;file name&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<p>Object scale is baked into the mesh. Location and rotation go onto the placed actor.</p>
+<h3>Naming conventions for extras</h3>
+<p>These are the same conventions Unreal's FBX importer uses. Make the helpers <strong>children</strong> of the object they belong to.</p>
+<table>
+<thead>
+<tr>
+  <th>Child object</th>
+  <th>Becomes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Mesh named <code>UCX_anything</code> (also <code>UBX_</code>, <code>USP_</code>, <code>UCP_</code>)</td>
+  <td>Custom collision: convex, box, sphere, capsule</td>
+</tr>
+<tr>
+  <td>Empty named <code>SOCKET_Name</code></td>
+  <td>Static mesh socket called <code>Name</code></td>
+</tr>
+<tr>
+  <td>Mesh named <code>anything_LOD1</code>, <code>_LOD2</code> ...</td>
+  <td>Extra LODs, in number order</td>
+</tr>
+</tbody>
+</table>
+<p><code>UCX_</code> collision must be convex. Relay warns you if it isn't.</p>
+<h2>Materials</h2>
+<p>Relay rebuilds each material as an instance of one of two parent materials it creates in <code>&lt;Content Folder&gt;/_Relay</code>: <code>M_Relay_Opaque</code> and <code>M_Relay_Masked</code>. It reads the Principled BSDF feeding the material output.</p>
+<table>
+<thead>
+<tr>
+  <th>Principled input</th>
+  <th>Transferred as</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Base Color</td>
+  <td>color or image texture</td>
+</tr>
+<tr>
+  <td>Metallic, Roughness</td>
+  <td>value, image texture, or one channel of a packed texture through <strong>Separate Color</strong></td>
+</tr>
+<tr>
+  <td>Normal</td>
+  <td>image texture through a <strong>Normal Map</strong> node, with the green channel flipped for Unreal</td>
+</tr>
+<tr>
+  <td>Emission Color, Emission Strength</td>
+  <td>color or image texture, times strength</td>
+</tr>
+<tr>
+  <td>Alpha</td>
+  <td>value, texture, or the base color texture's alpha. Any alpha makes the material masked</td>
+</tr>
+</tbody>
+</table>
+<p>Procedural textures, math nodes between the texture and the BSDF, bump nodes and UDIM tiles are not transferred. Relay tells you when it falls back to a constant value. For complex shaders, bake them to image textures first.</p>
+<p>Materials whose names contain spaces or dots (<code>Old Wood.001</code>) are matched to their mesh slots even after Unreal renames them.</p>
+<h2>Characters and animation</h2>
+<ul>
+<li>Select the armature, or any mesh it deforms. Relay sends the rig with every mesh it deforms.</li>
+<li><strong>Animations</strong>: <em>Active Action</em> sends the current action. <em>All Matching</em> sends every action that animates the rig's bones. <em>None</em> sends the mesh only.</li>
+<li><strong>Deform Bones Only</strong> leaves control bones out of the Unreal skeleton.</li>
+<li><strong>Target Skeleton</strong>: set this to an existing skeleton asset, such as the UE5 mannequin's, to import onto it. Bone names must match.</li>
+</ul>
+<p>Relay exports a temporary centimeter-scale copy of your rig, so the skeleton arrives with no x100 scale on the root bone and no extra &quot;Armature&quot; root bone. Your own objects, meshes and actions are never changed.</p>
+<p>Skinned meshes should be parented to their armature. Shape keys are kept unless the mesh also has non-armature modifiers such as Bevel or Subdivision. Relay warns you in that case.</p>
+<h2>Cameras and Sequencer</h2>
+<p>Cameras in the selection go into one Level Sequence, <code>&lt;Content Folder&gt;/Cinematics/LS_&lt;file name&gt;</code>, covering the scene's frame range at the scene's frame rate.</p>
+<ul>
+<li>Each camera becomes a <strong>Cine Camera</strong> placed in the level. Its movement, rotation and focal length are keyed on every frame, so what you see through the Blender camera is what Sequencer plays back.</li>
+<li>With <strong>depth of field</strong> on, the focus distance is keyed too, including a focus object followed frame by frame, and the f-stop is copied.</li>
+<li><strong>Timeline markers bound to cameras</strong> (Ctrl+B in the timeline) become camera cuts, the same way Blender switches cameras. Without markers, the scene camera is used for the whole range.</li>
+<li>The sensor size follows your render aspect ratio and Blender's sensor fit.</li>
+<li>Sending again updates the same sequence and cameras. Tracks and cameras you added yourself in Sequencer are left alone.</li>
+</ul>
+<p>Not transferred: lens shift, and orthographic cameras (Unreal's Cine Camera is perspective only). Relay warns about both.</p>
+<h2>Settings</h2>
+<table>
+<thead>
+<tr>
+  <th>Setting</th>
+  <th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Content Folder</td>
+  <td>Where assets go in the Unreal project. Must start with <code>/Game</code></td>
+</tr>
+<tr>
+  <td>Folders</td>
+  <td><em>By Type</em> (Meshes, Materials, Textures, Animations), <em>By Collection</em> (mirrors your collections) or <em>Flat</em></td>
+</tr>
+<tr>
+  <td>Naming Prefixes</td>
+  <td>Adds <code>SM_</code>, <code>SK_</code>, <code>A_</code>, <code>MI_</code>, <code>T_</code> (Epic's convention)</td>
+</tr>
+<tr>
+  <td>Materials and Textures</td>
+  <td>Turn off to send geometry only</td>
+</tr>
+<tr>
+  <td>Place in Level</td>
+  <td>Adds actors at the Blender positions. Sending again moves the same actors</td>
+</tr>
+<tr>
+  <td>Outliner Folder</td>
+  <td>Folder for placed actors in Unreal's Outliner</td>
+</tr>
+<tr>
+  <td>Collision</td>
+  <td><em>Custom Only</em>, or <em>Custom or Box</em> (adds a simple box when there is no <code>UCX_</code>)</td>
+</tr>
+<tr>
+  <td>Generate Lightmap UVs</td>
+  <td>Unreal's lightmap UV generation for static meshes</td>
+</tr>
+<tr>
+  <td>Nanite</td>
+  <td>Builds static meshes with Nanite</td>
+</tr>
+<tr>
+  <td>Cameras to Sequencer</td>
+  <td>Sends cameras into a Level Sequence (see Cameras and Sequencer)</td>
+</tr>
+<tr>
+  <td>Exchange Folder</td>
+  <td>Where FBX files are written for Unreal to read. The last three sends are kept</td>
+</tr>
+</tbody>
+</table>
+<p>Network settings are in <strong>Preferences &gt; Add-ons &gt; Relay</strong> and match Unreal's defaults. If port 6776 is busy, for example because Send to Unreal is also open, Relay picks the next free port by itself.</p>
+<h2>Troubleshooting</h2>
+<p><strong>&quot;No Unreal Editor found&quot;</strong>
+Unreal must be open with a project loaded, and <strong>Enable Remote Execution</strong> must be ticked (see Set up Unreal). If you changed Unreal's <em>Multicast Group Endpoint</em> or <em>Multicast Bind Address</em>, make Relay's preferences match.</p>
+<p><strong>Several editors are open</strong>
+Pick the one you want in the editor list at the top of the Relay tab.</p>
+<p><strong>The send finished but a material is grey</strong>
+The material isn't built on a Principled BSDF, or its texture file is missing. Run <strong>Check</strong> to see which.</p>
+<p><strong>Animations are missing</strong>
+Set <strong>Animations</strong> to <em>All Matching</em>, or make the action active on the armature.</p>
+<p><strong>&quot;Unreal needs one root bone&quot;</strong>
+Unreal skeletons have exactly one root. Parent your top-level deform bones to a single root bone.</p>
+<p><strong>Where are the exported files?</strong>
+<strong>Advanced &gt; Open Exchange Folder</strong>. Attach the newest <code>send_*</code> folder when you ask for support.</p>
+<h2>Support</h2>
+<p>Email <strong>support@szmc.co.za</strong> with your Blender and Unreal versions, what you sent, and what went wrong. A zip of the newest <code>send_*</code> folder from the exchange folder helps a lot.</p>
+<h2>Known limitations (1.1)</h2>
+<ul>
+<li>Blender and Unreal must be on the same machine.</li>
+<li>No UDIMs, procedural materials or Blender Bump nodes.</li>
+<li>Unreal to Blender (the reverse direction) isn't supported.</li>
+<li>Sending doesn't save your Unreal level. Imported assets are saved.</li>
+</ul>
+<h2>Changelog</h2>
+<p><strong>1.1.0</strong>: Cameras into Unreal's Sequencer: Cine Cameras with movement, focal length and focus keyed per frame, and marker-based camera cuts. Fixes Unreal 5.5 skeletal import.</p>
+<p><strong>1.0.0</strong>: First release.</p>
+</main>
+<footer><div class="in">Seizmic Enterprises (Pty) Ltd &middot; Support: <a href="mailto:support@szmc.co.za">support@szmc.co.za</a></div></footer>
+</body></html>
