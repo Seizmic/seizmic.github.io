@@ -266,6 +266,8 @@ bRemoteExecution=True
 <h2>Troubleshooting</h2>
 <p><strong>&quot;No Unreal Editor found&quot;</strong>
 Unreal must be open with a project loaded, and <strong>Enable Remote Execution</strong> must be ticked (see Set up Unreal). If you changed Unreal's <em>Multicast Group Endpoint</em> or <em>Multicast Bind Address</em>, make Relay's preferences match.</p>
+<p><strong>Half the object is under the floor</strong>
+Relay places objects exactly where they are in Blender, around their origin. Blender's default cube is centered on the origin, so half of it sits below the grid in Blender too, and below the floor in Unreal. Move the object up in Blender, or set its origin to the bottom (<strong>Object &gt; Set Origin</strong>), and send again.</p>
 <p><strong>Several editors are open</strong>
 Pick the one you want in the editor list at the top of the Relay tab.</p>
 <p><strong>The send finished but a material is grey</strong>
