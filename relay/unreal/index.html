@@ -70,7 +70,7 @@ footer .in { padding:22px 20px; }
 <h2>Install</h2>
 <ol>
 <li>Install the plugin from Fab into your engine version (Fab &gt; Library &gt; Install to Engine), then open your project and enable <strong>Relay for Unreal</strong> under <strong>Edit &gt; Plugins &gt; Importers</strong>. Restart the editor when asked.</li>
-<li>Relay looks for Blender by itself: first the program Windows opens <code>.blend</code> files with, then <code>C:\Program Files\Blender Foundation</code>. If Blender is somewhere else, or you have several versions, set <strong>Blender Executable</strong> under <strong>Edit &gt; Project Settings &gt; Plugins &gt; Relay for Unreal</strong>.</li>
+<li>Relay looks for Blender by itself: first the program Windows opens <code>.blend</code> files with, then <code>C:\Program Files\Blender Foundation</code>. If Blender is somewhere else, or you have several versions, set <strong>Blender Executable</strong> under <strong>Edit &gt; Editor Preferences &gt; Plugins &gt; Relay for Unreal</strong>.</li>
 </ol>
 <h2>Importing</h2>
 <p>Any of these imports a <code>.blend</code>:</p>
@@ -196,7 +196,7 @@ footer .in { padding:22px 20px; }
 <h2>Cameras and Sequencer</h2>
 <p>Cameras go into one Level Sequence, <code>&lt;folder&gt;/Cinematics/LS_&lt;file name&gt;</code>, covering the scene's frame range at its frame rate. Position, rotation and focal length are keyed on every frame, and so are the focus distance and f-stop when depth of field is on. Timeline markers bound to cameras become camera cuts. Lens shift and orthographic cameras are not transferred.</p>
 <h2>Settings</h2>
-<p><strong>Edit &gt; Project Settings &gt; Plugins &gt; Relay for Unreal</strong>. They apply to new imports and re-imports in this project.</p>
+<p><strong>Edit &gt; Editor Preferences &gt; Plugins &gt; Relay for Unreal</strong>, or <strong>Tools &gt; Relay &gt; Relay Settings</strong>. They are saved for you in this project, so each person on a team can point at their own Blender.</p>
 <table>
 <thead>
 <tr>
